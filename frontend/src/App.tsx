@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Sidebar from './components/Sidebar';
@@ -45,20 +45,27 @@ const theme = createTheme({
   },
 });
 
-function App() {
+const App = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const handleSidebarToggle = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
         <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-          <Sidebar />
+          <Sidebar open={sidebarOpen} onToggle={handleSidebarToggle} />
           <Box
             component="main"
             sx={{
               flexGrow: 1,
+              transition: 'margin 0.2s ease-in-out',
+              marginLeft: sidebarOpen ? '240px' : '65px',
               bgcolor: 'background.default',
               p: 3,
-              marginLeft: '240px',
             }}
           >
             <Routes>
@@ -73,6 +80,6 @@ function App() {
       </Router>
     </ThemeProvider>
   );
-}
+};
 
 export default App;
