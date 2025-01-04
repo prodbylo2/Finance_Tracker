@@ -1,6 +1,9 @@
 import { EChartsOption } from 'echarts-for-react';
 
-export const getExpensePieChartConfig = (data: { name: string; value: number }[]): EChartsOption => ({
+export const getExpensePieChartConfig = (
+  data: { name: string; value: number }[],
+  textColor: string
+): EChartsOption => ({
   tooltip: {
     trigger: 'item',
     formatter: (params: any) => {
@@ -10,12 +13,17 @@ export const getExpensePieChartConfig = (data: { name: string; value: number }[]
       });
       return `${params.name}: ${value} (${params.percent}%)`;
     },
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    textStyle: {
+      color: textColor,
+    },
   },
   legend: {
     orient: 'vertical',
     left: 'left',
     textStyle: {
-      color: '#2D3250',
+      color: textColor,
     },
   },
   series: [
@@ -26,18 +34,20 @@ export const getExpensePieChartConfig = (data: { name: string; value: number }[]
       avoidLabelOverlap: true,
       itemStyle: {
         borderRadius: 10,
-        borderColor: '#fff',
+        borderColor: textColor,
         borderWidth: 2,
       },
       label: {
         show: false,
         position: 'center',
+        color: textColor,
       },
       emphasis: {
         label: {
           show: true,
           fontSize: '18',
           fontWeight: 'bold',
+          color: textColor,
         },
       },
       labelLine: {
@@ -55,6 +65,9 @@ export const getIncomeExpenseLineChartConfig = (
   dates: string[],
   incomeData: number[],
   expenseData: number[],
+  textColor: string,
+  axisLineColor: string,
+  splitLineColor: string
 ): EChartsOption => ({
   tooltip: {
     trigger: 'axis',
@@ -70,48 +83,42 @@ export const getIncomeExpenseLineChartConfig = (
         style: 'currency',
         currency: 'USD',
       });
-      return `${params[0].axisValue}<br/>
-              Income: ${income}<br/>
-              Expenses: ${expense}`;
+      return `${params[0].axisValue}<br/>Income: ${income}<br/>Expenses: ${expense}`;
+    },
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    textStyle: {
+      color: textColor,
     },
   },
   legend: {
     data: ['Income', 'Expenses'],
-    bottom: 0,
     textStyle: {
-      color: '#2D3250',
+      color: textColor,
     },
   },
   grid: {
     left: '3%',
     right: '4%',
-    bottom: '15%',
-    top: '3%',
+    bottom: '3%',
     containLabel: true,
   },
   xAxis: {
     type: 'category',
     data: dates,
-    boundaryGap: false,
+    axisLabel: {
+      color: textColor,
+    },
     axisLine: {
       lineStyle: {
-        color: '#676FA3',
+        color: axisLineColor,
       },
-    },
-    axisLabel: {
-      color: '#676FA3',
-      rotate: dates.length > 12 ? 45 : 0,
     },
   },
   yAxis: {
     type: 'value',
-    axisLine: {
-      lineStyle: {
-        color: '#676FA3',
-      },
-    },
     axisLabel: {
-      color: '#676FA3',
+      color: textColor,
       formatter: (value: number) =>
         value.toLocaleString('en-US', {
           style: 'currency',
@@ -120,9 +127,14 @@ export const getIncomeExpenseLineChartConfig = (
           maximumFractionDigits: 0,
         }),
     },
+    axisLine: {
+      lineStyle: {
+        color: axisLineColor,
+      },
+    },
     splitLine: {
       lineStyle: {
-        color: 'rgba(103, 111, 163, 0.1)',
+        color: splitLineColor,
       },
     },
   },
@@ -130,8 +142,8 @@ export const getIncomeExpenseLineChartConfig = (
     {
       name: 'Income',
       type: 'line',
-      smooth: true,
       data: incomeData,
+      smooth: true,
       symbol: 'circle',
       symbolSize: 8,
       itemStyle: {
@@ -165,8 +177,8 @@ export const getIncomeExpenseLineChartConfig = (
     {
       name: 'Expenses',
       type: 'line',
-      smooth: true,
       data: expenseData,
+      smooth: true,
       symbol: 'circle',
       symbolSize: 8,
       itemStyle: {
@@ -204,15 +216,26 @@ export const getIncomeExpenseLineChartConfig = (
 export const getInvestmentPerformanceChartConfig = (
   dates: string[],
   performanceData: number[],
+  textColor: string,
+  axisLineColor: string,
+  splitLineColor: string
 ): EChartsOption => ({
   tooltip: {
     trigger: 'axis',
+    axisPointer: {
+      type: 'shadow',
+    },
     formatter: (params: any) => {
       const value = params[0].value.toLocaleString('en-US', {
         style: 'currency',
         currency: 'USD',
       });
-      return `${params[0].axisValue}<br/>Return: ${value}`;
+      return `${params[0].axisValue}<br/>Performance: ${value}`;
+    },
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    textStyle: {
+      color: textColor,
     },
   },
   grid: {
@@ -224,26 +247,19 @@ export const getInvestmentPerformanceChartConfig = (
   xAxis: {
     type: 'category',
     data: dates,
-    boundaryGap: false,
+    axisLabel: {
+      color: textColor,
+    },
     axisLine: {
       lineStyle: {
-        color: '#676FA3',
+        color: axisLineColor,
       },
-    },
-    axisLabel: {
-      color: '#676FA3',
-      rotate: dates.length > 12 ? 45 : 0,
     },
   },
   yAxis: {
     type: 'value',
-    axisLine: {
-      lineStyle: {
-        color: '#676FA3',
-      },
-    },
     axisLabel: {
-      color: '#676FA3',
+      color: textColor,
       formatter: (value: number) =>
         value.toLocaleString('en-US', {
           style: 'currency',
@@ -252,17 +268,22 @@ export const getInvestmentPerformanceChartConfig = (
           maximumFractionDigits: 0,
         }),
     },
+    axisLine: {
+      lineStyle: {
+        color: axisLineColor,
+      },
+    },
     splitLine: {
       lineStyle: {
-        color: 'rgba(103, 111, 163, 0.1)',
+        color: splitLineColor,
       },
     },
   },
   series: [
     {
       type: 'line',
-      smooth: true,
       data: performanceData,
+      smooth: true,
       symbol: 'circle',
       symbolSize: 8,
       itemStyle: {
