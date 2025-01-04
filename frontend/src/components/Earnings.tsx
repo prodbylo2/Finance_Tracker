@@ -138,6 +138,25 @@ const Earnings = () => {
     }
   };
 
+  const handleDelete = async (index: number) => {
+    try {
+      await api.deleteEarning(index);
+      await fetchEarnings();
+      setSnackbar({
+        open: true,
+        message: 'Earning deleted successfully',
+        severity: 'success',
+      });
+    } catch (error: any) {
+      console.error('Error deleting earning:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.error || 'Error deleting earning',
+        severity: 'error',
+      });
+    }
+  };
+
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -155,7 +174,7 @@ const Earnings = () => {
         </Button>
       </Box>
 
-      <DataTable columns={columns} rows={earnings} />
+      <DataTable columns={columns} rows={earnings} onDelete={handleDelete} />
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Earning</DialogTitle>

@@ -65,6 +65,26 @@ def add_entry(category):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/<category>/<int:index>', methods=['DELETE'])
+def delete_entry(category, index):
+    try:
+        if category not in categories:
+            return jsonify({'error': 'Invalid category'}), 400
+        
+        file_path = data_dir / f'{category}.csv'
+        df = pd.read_csv(file_path)
+        
+        if index < 0 or index >= len(df):
+            return jsonify({'error': 'Invalid index'}), 400
+            
+        # Remove the row at the specified index
+        df = df.drop(index)
+        df.to_csv(file_path, index=False)
+        
+        return jsonify({'message': f'{category} entry deleted successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/dashboard', methods=['GET'])
 def get_dashboard_data():
     try:

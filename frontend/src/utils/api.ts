@@ -32,6 +32,10 @@ const api = {
     const response = await axios.post(`${API_BASE_URL}/expenses`, expense);
     return response.data;
   },
+  deleteExpense: async (index: number) => {
+    const response = await axios.delete(`${API_BASE_URL}/expenses/${index}`);
+    return response.data;
+  },
 
   // Earnings
   getEarnings: async () => {
@@ -40,6 +44,10 @@ const api = {
   },
   addEarning: async (earning: FinanceItem) => {
     const response = await axios.post(`${API_BASE_URL}/earnings`, earning);
+    return response.data;
+  },
+  deleteEarning: async (index: number) => {
+    const response = await axios.delete(`${API_BASE_URL}/earnings/${index}`);
     return response.data;
   },
 
@@ -52,6 +60,10 @@ const api = {
     const response = await axios.post(`${API_BASE_URL}/investments`, investment);
     return response.data;
   },
+  deleteInvestment: async (index: number) => {
+    const response = await axios.delete(`${API_BASE_URL}/investments/${index}`);
+    return response.data;
+  },
 
   // Goals
   getGoals: async () => {
@@ -60,6 +72,10 @@ const api = {
   },
   addGoal: async (goal: FinanceItem) => {
     const response = await axios.post(`${API_BASE_URL}/goals`, goal);
+    return response.data;
+  },
+  deleteGoal: async (index: number) => {
+    const response = await axios.delete(`${API_BASE_URL}/goals/${index}`);
     return response.data;
   },
 };

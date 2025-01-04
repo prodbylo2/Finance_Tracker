@@ -140,6 +140,25 @@ const Expenses = () => {
     }
   };
 
+  const handleDelete = async (index: number) => {
+    try {
+      await api.deleteExpense(index);
+      await fetchExpenses();
+      setSnackbar({
+        open: true,
+        message: 'Expense deleted successfully',
+        severity: 'success',
+      });
+    } catch (error: any) {
+      console.error('Error deleting expense:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.error || 'Error deleting expense',
+        severity: 'error',
+      });
+    }
+  };
+
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -157,7 +176,7 @@ const Expenses = () => {
         </Button>
       </Box>
 
-      <DataTable columns={columns} rows={expenses} />
+      <DataTable columns={columns} rows={expenses} onDelete={handleDelete} />
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Expense</DialogTitle>

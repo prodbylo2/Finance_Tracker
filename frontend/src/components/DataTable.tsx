@@ -6,9 +6,12 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
   TablePagination,
+  TableRow,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Column {
   id: string;
@@ -21,10 +24,11 @@ interface Column {
 interface DataTableProps {
   columns: Column[];
   rows: any[];
+  onDelete?: (index: number) => void;
   pageSize?: number;
 }
 
-const DataTable: React.FC<DataTableProps> = ({ columns, rows, pageSize = 10 }) => {
+const DataTable: React.FC<DataTableProps> = ({ columns, rows, onDelete, pageSize = 10 }) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(pageSize);
 
@@ -52,6 +56,7 @@ const DataTable: React.FC<DataTableProps> = ({ columns, rows, pageSize = 10 }) =
                   {column.label}
                 </TableCell>
               ))}
+              {onDelete && <TableCell style={{ minWidth: 50 }}>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -70,6 +75,24 @@ const DataTable: React.FC<DataTableProps> = ({ columns, rows, pageSize = 10 }) =
                         </TableCell>
                       );
                     })}
+                    {onDelete && (
+                      <TableCell>
+                        <Tooltip title="Delete">
+                          <IconButton
+                            onClick={() => onDelete(page * rowsPerPage + index)}
+                            size="small"
+                            sx={{
+                              color: 'text.secondary',
+                              '&:hover': {
+                                color: 'error.main',
+                              },
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
