@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Paper, Typography } from '@mui/material';
+import { Box, Grid, Paper, Typography, useTheme } from '@mui/material';
 import ReactECharts from 'echarts-for-react';
 import { EChartsOption } from 'echarts-for-react';
 import api from '../utils/api';
@@ -223,6 +223,7 @@ const getInvestmentPerformanceChartConfig = (
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const { textColor, axisLineColor, splitLineColor } = useChartTheme();
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -254,15 +255,41 @@ const Dashboard = () => {
         {/* Summary Cards */}
         <Grid item xs={12} md={3}>
           <Paper
+            elevation={2}
             sx={{
               p: 2,
               display: 'flex',
               flexDirection: 'column',
-              backgroundColor: '#4CAF50',
-              color: 'white',
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              position: 'relative',
+              '&::before, &::after': {
+                content: '""',
+                position: 'absolute',
+                inset: 0,
+                transition: 'all 0.3s ease-in-out',
+              },
+              '&::before': {
+                borderLeft: `2px solid ${theme.palette.info.main}`,
+                borderRight: `2px solid ${theme.palette.info.main}`,
+                transform: 'scaleY(0)',
+              },
+              '&::after': {
+                borderTop: `2px solid ${theme.palette.info.main}`,
+                borderBottom: `2px solid ${theme.palette.info.main}`,
+                transform: 'scaleX(0)',
+              },
+              '&:hover::before': {
+                transform: 'scaleY(1)',
+              },
+              '&:hover::after': {
+                transform: 'scaleX(1)',
+              },
             }}
           >
-            <Typography variant="h6">Total Balance</Typography>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              Total Balance
+            </Typography>
             <Typography variant="h4">
               ${dashboardData
                 ? (dashboardData.total_earnings - dashboardData.total_expenses).toLocaleString()
@@ -272,15 +299,41 @@ const Dashboard = () => {
         </Grid>
         <Grid item xs={12} md={3}>
           <Paper
+            elevation={2}
             sx={{
               p: 2,
               display: 'flex',
               flexDirection: 'column',
-              backgroundColor: '#2196F3',
-              color: 'white',
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              position: 'relative',
+              '&::before, &::after': {
+                content: '""',
+                position: 'absolute',
+                inset: 0,
+                transition: 'all 0.3s ease-in-out',
+              },
+              '&::before': {
+                borderLeft: `2px solid ${theme.palette.success.main}`,
+                borderRight: `2px solid ${theme.palette.success.main}`,
+                transform: 'scaleY(0)',
+              },
+              '&::after': {
+                borderTop: `2px solid ${theme.palette.success.main}`,
+                borderBottom: `2px solid ${theme.palette.success.main}`,
+                transform: 'scaleX(0)',
+              },
+              '&:hover::before': {
+                transform: 'scaleY(1)',
+              },
+              '&:hover::after': {
+                transform: 'scaleX(1)',
+              },
             }}
           >
-            <Typography variant="h6">Total Earnings</Typography>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              Total Earnings
+            </Typography>
             <Typography variant="h4">
               ${dashboardData?.total_earnings.toLocaleString() || '0'}
             </Typography>
@@ -288,15 +341,41 @@ const Dashboard = () => {
         </Grid>
         <Grid item xs={12} md={3}>
           <Paper
+            elevation={2}
             sx={{
               p: 2,
               display: 'flex',
               flexDirection: 'column',
-              backgroundColor: '#F44336',
-              color: 'white',
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              position: 'relative',
+              '&::before, &::after': {
+                content: '""',
+                position: 'absolute',
+                inset: 0,
+                transition: 'all 0.3s ease-in-out',
+              },
+              '&::before': {
+                borderLeft: `2px solid ${theme.palette.error.main}`,
+                borderRight: `2px solid ${theme.palette.error.main}`,
+                transform: 'scaleY(0)',
+              },
+              '&::after': {
+                borderTop: `2px solid ${theme.palette.error.main}`,
+                borderBottom: `2px solid ${theme.palette.error.main}`,
+                transform: 'scaleX(0)',
+              },
+              '&:hover::before': {
+                transform: 'scaleY(1)',
+              },
+              '&:hover::after': {
+                transform: 'scaleX(1)',
+              },
             }}
           >
-            <Typography variant="h6">Total Expenses</Typography>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              Total Expenses
+            </Typography>
             <Typography variant="h4">
               ${dashboardData?.total_expenses.toLocaleString() || '0'}
             </Typography>
@@ -304,15 +383,41 @@ const Dashboard = () => {
         </Grid>
         <Grid item xs={12} md={3}>
           <Paper
+            elevation={2}
             sx={{
               p: 2,
               display: 'flex',
               flexDirection: 'column',
-              backgroundColor: '#FF9800',
-              color: 'white',
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              position: 'relative',
+              '&::before, &::after': {
+                content: '""',
+                position: 'absolute',
+                inset: 0,
+                transition: 'all 0.3s ease-in-out',
+              },
+              '&::before': {
+                borderLeft: `2px solid ${theme.palette.warning.main}`,
+                borderRight: `2px solid ${theme.palette.warning.main}`,
+                transform: 'scaleY(0)',
+              },
+              '&::after': {
+                borderTop: `2px solid ${theme.palette.warning.main}`,
+                borderBottom: `2px solid ${theme.palette.warning.main}`,
+                transform: 'scaleX(0)',
+              },
+              '&:hover::before': {
+                transform: 'scaleY(1)',
+              },
+              '&:hover::after': {
+                transform: 'scaleX(1)',
+              },
             }}
           >
-            <Typography variant="h6">Total Investments</Typography>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              Total Investments
+            </Typography>
             <Typography variant="h4">
               ${dashboardData?.total_investments.toLocaleString() || '0'}
             </Typography>
