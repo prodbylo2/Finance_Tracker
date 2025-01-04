@@ -70,7 +70,7 @@ const api = {
     const response = await axios.get(`${API_BASE_URL}/goals`);
     return response.data;
   },
-  addGoal: async (goal: FinanceItem) => {
+  addGoal: async (goal: any) => {
     const response = await axios.post(`${API_BASE_URL}/goals`, goal);
     return response.data;
   },

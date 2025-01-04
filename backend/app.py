@@ -21,8 +21,21 @@ for category in categories:
         elif category == 'investments':
             df = pd.DataFrame(columns=['date', 'amount', 'type', 'name', 'notes'])
         else:  # goals
-            df = pd.DataFrame(columns=['name', 'target_amount', 'current_amount', 'target_date', 'notes'])
+            df = pd.DataFrame(columns=['name', 'target_amount', 'description', 'target_date'])
         df.to_csv(file_path, index=False)
+
+def calculate_savings():
+    try:
+        expenses_df = pd.read_csv(data_dir / 'expenses.csv')
+        earnings_df = pd.read_csv(data_dir / 'earnings.csv')
+        
+        total_expenses = expenses_df['amount'].sum() if not expenses_df.empty else 0
+        total_earnings = earnings_df['amount'].sum() if not earnings_df.empty else 0
+        
+        return total_earnings - total_expenses
+    except Exception as e:
+        print(f"Error calculating savings: {str(e)}")
+        return 0
 
 @app.route('/api/<category>', methods=['GET'])
 def get_data(category):
@@ -50,7 +63,7 @@ def add_entry(category):
             'expenses': ['date', 'amount', 'category', 'description'],
             'earnings': ['date', 'amount', 'category', 'description'],
             'investments': ['date', 'amount', 'type', 'name'],
-            'goals': ['name', 'target_amount', 'current_amount', 'target_date']
+            'goals': ['name', 'target_amount', 'description', 'target_date']
         }
         
         missing_fields = [field for field in required_fields[category] if field not in data]
@@ -123,7 +136,7 @@ def get_dashboard_data():
             print("Goals DataFrame:", goals_df.head())
         except Exception as e:
             print(f"Error reading goals.csv: {str(e)}")
-            goals_df = pd.DataFrame(columns=['name', 'target_amount', 'current_amount', 'target_date', 'notes'])
+            goals_df = pd.DataFrame(columns=['name', 'target_amount', 'description', 'target_date'])
         
         # Calculate totals with error handling
         total_expenses = expenses_df['amount'].sum() if not expenses_df.empty else 0
@@ -136,15 +149,22 @@ def get_dashboard_data():
         # Create goals progress with error handling
         goals_progress = []
         if not goals_df.empty:
+            current_savings = calculate_savings()
             for _, row in goals_df.iterrows():
                 try:
-                    progress = (row['current_amount'] / row['target_amount']) * 100
-                    goals_progress.append({
-                        'name': row['name'],
-                        'progress': progress
-                    })
+                    target_amount = row['target_amount']
+                    savings_needed = target_amount / 0.3  # 30% of savings
+                    progress = min((current_savings / savings_needed) * 100, 100) if savings_needed > 0 else 0
+                    
+                    # Only include goals that haven't reached 100% progress
+                    if progress < 100:
+                        goals_progress.append({
+                            'name': row['name'],
+                            'progress': progress
+                        })
                 except Exception as e:
-                    print(f"Error processing goal {row['name']}: {str(e)}")
+                    print(f"Error processing goal: {str(e)}")
+                    continue
         
         dashboard_data = {
             'total_expenses': float(total_expenses),
@@ -158,6 +178,54 @@ def get_dashboard_data():
         return jsonify(dashboard_data)
     except Exception as e:
         print(f"Error in get_dashboard_data: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/goals', methods=['GET'])
+def get_goals():
+    try:
+        goals_df = pd.read_csv(data_dir / 'goals.csv')
+        if goals_df.empty:
+            return jsonify([])
+            
+        current_savings = calculate_savings()
+        
+        # Calculate progress for each goal (30% of savings = 100% progress)
+        goals_list = []
+        for _, goal in goals_df.iterrows():
+            target_amount = goal['target_amount']
+            savings_needed = target_amount / 0.3  # 30% of savings
+            progress = min((current_savings / savings_needed) * 100, 100) if savings_needed > 0 else 0
+            
+            goals_list.append({
+                'name': goal['name'],
+                'target_amount': goal['target_amount'],
+                'description': goal['description'],
+                'target_date': goal['target_date'],
+                'progress': progress
+            })
+            
+        return jsonify(goals_list)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/goals', methods=['POST'])
+def add_goal():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+            
+        required_fields = ['name', 'target_amount', 'description', 'target_date']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+            
+        goals_df = pd.read_csv(data_dir / 'goals.csv')
+        goals_df = pd.concat([goals_df, pd.DataFrame([data])], ignore_index=True)
+        goals_df.to_csv(data_dir / 'goals.csv', index=False)
+        
+        return jsonify({'message': 'Goal added successfully'})
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
