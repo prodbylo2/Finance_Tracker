@@ -14,6 +14,10 @@ import {
 } from '@mui/material';
 import DataTable from './DataTable';
 import api from '../utils/api';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 const categories = [
   'Salary',
@@ -179,20 +183,28 @@ const Earnings = () => {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Earning</DialogTitle>
         <DialogContent>
-          <TextField
-            margin="dense"
-            label="Date"
-            type="date"
-            fullWidth
-            required
-            InputLabelProps={{ shrink: true }}
-            value={newEarning.date}
-            onChange={(e) =>
-              setNewEarning({ ...newEarning, date: e.target.value })
-            }
-            error={errors.date}
-            helperText={errors.date && 'Date is required'}
-          />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Date"
+              value={dayjs(newEarning.date)}
+              onChange={(newValue) => {
+                if (newValue) {
+                  setNewEarning({
+                    ...newEarning,
+                    date: newValue.format('YYYY-MM-DD'),
+                  });
+                }
+              }}
+              slotProps={{
+                textField: {
+                  error: errors.date,
+                  helperText: errors.date && 'Date is required',
+                  fullWidth: true,
+                  margin: "dense"
+                }
+              }}
+            />
+          </LocalizationProvider>
           <TextField
             margin="dense"
             label="Amount"

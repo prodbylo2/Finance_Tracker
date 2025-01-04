@@ -18,6 +18,10 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../utils/api';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 interface Goal {
   name: string;
@@ -231,13 +235,11 @@ const Goals = () => {
         <DialogContent>
           <TextField
             margin="dense"
-            label="Goal Name"
+            label="Name"
             fullWidth
             required
             value={newGoal.name}
-            onChange={(e) =>
-              setNewGoal({ ...newGoal, name: e.target.value })
-            }
+            onChange={(e) => setNewGoal({ ...newGoal, name: e.target.value })}
             error={errors.name}
             helperText={errors.name && 'Name is required'}
           />
@@ -249,11 +251,33 @@ const Goals = () => {
             required
             value={newGoal.target_amount}
             onChange={(e) =>
-              setNewGoal({ ...newGoal, target_amount: parseFloat(e.target.value) || 0 })
+              setNewGoal({ ...newGoal, target_amount: Number(e.target.value) })
             }
             error={errors.target_amount}
-            helperText={errors.target_amount && 'Amount must be greater than 0'}
+            helperText={errors.target_amount && 'Target amount must be greater than 0'}
           />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Target Date"
+              value={dayjs(newGoal.target_date)}
+              onChange={(newValue) => {
+                if (newValue) {
+                  setNewGoal({
+                    ...newGoal,
+                    target_date: newValue.format('YYYY-MM-DD'),
+                  });
+                }
+              }}
+              slotProps={{
+                textField: {
+                  error: errors.target_date,
+                  helperText: errors.target_date && 'Target date is required',
+                  fullWidth: true,
+                  margin: "dense"
+                }
+              }}
+            />
+          </LocalizationProvider>
           <TextField
             margin="dense"
             label="Description"
@@ -267,20 +291,6 @@ const Goals = () => {
             }
             error={errors.description}
             helperText={errors.description && 'Description is required'}
-          />
-          <TextField
-            margin="dense"
-            label="Target Date"
-            type="date"
-            fullWidth
-            required
-            InputLabelProps={{ shrink: true }}
-            value={newGoal.target_date}
-            onChange={(e) =>
-              setNewGoal({ ...newGoal, target_date: e.target.value })
-            }
-            error={errors.target_date}
-            helperText={errors.target_date && 'Target date is required'}
           />
         </DialogContent>
         <DialogActions>
