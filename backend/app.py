@@ -68,24 +68,76 @@ def add_entry(category):
 @app.route('/api/dashboard', methods=['GET'])
 def get_dashboard_data():
     try:
-        expenses_df = pd.read_csv(data_dir / 'expenses.csv')
-        earnings_df = pd.read_csv(data_dir / 'earnings.csv')
-        investments_df = pd.read_csv(data_dir / 'investments.csv')
-        goals_df = pd.read_csv(data_dir / 'goals.csv')
+        print("Starting get_dashboard_data...")
+        print(f"Data directory path: {data_dir}")
+        
+        # Check if files exist
+        for file_name in ['expenses.csv', 'earnings.csv', 'investments.csv', 'goals.csv']:
+            file_path = data_dir / file_name
+            print(f"Checking {file_name}: exists = {file_path.exists()}")
+        
+        # Read CSV files with error handling
+        try:
+            expenses_df = pd.read_csv(data_dir / 'expenses.csv')
+            print("Expenses DataFrame:", expenses_df.head())
+        except Exception as e:
+            print(f"Error reading expenses.csv: {str(e)}")
+            expenses_df = pd.DataFrame(columns=['date', 'amount', 'category', 'description'])
+
+        try:
+            earnings_df = pd.read_csv(data_dir / 'earnings.csv')
+            print("Earnings DataFrame:", earnings_df.head())
+        except Exception as e:
+            print(f"Error reading earnings.csv: {str(e)}")
+            earnings_df = pd.DataFrame(columns=['date', 'amount', 'category', 'description'])
+
+        try:
+            investments_df = pd.read_csv(data_dir / 'investments.csv')
+            print("Investments DataFrame:", investments_df.head())
+        except Exception as e:
+            print(f"Error reading investments.csv: {str(e)}")
+            investments_df = pd.DataFrame(columns=['date', 'amount', 'type', 'name', 'notes'])
+
+        try:
+            goals_df = pd.read_csv(data_dir / 'goals.csv')
+            print("Goals DataFrame:", goals_df.head())
+        except Exception as e:
+            print(f"Error reading goals.csv: {str(e)}")
+            goals_df = pd.DataFrame(columns=['name', 'target_amount', 'current_amount', 'target_date', 'notes'])
+        
+        # Calculate totals with error handling
+        total_expenses = expenses_df['amount'].sum() if not expenses_df.empty else 0
+        total_earnings = earnings_df['amount'].sum() if not earnings_df.empty else 0
+        total_investments = investments_df['amount'].sum() if not investments_df.empty else 0
+        
+        # Create expense categories dict with error handling
+        expense_categories = expenses_df.groupby('category')['amount'].sum().to_dict() if not expenses_df.empty else {}
+        
+        # Create goals progress with error handling
+        goals_progress = []
+        if not goals_df.empty:
+            for _, row in goals_df.iterrows():
+                try:
+                    progress = (row['current_amount'] / row['target_amount']) * 100
+                    goals_progress.append({
+                        'name': row['name'],
+                        'progress': progress
+                    })
+                except Exception as e:
+                    print(f"Error processing goal {row['name']}: {str(e)}")
         
         dashboard_data = {
-            'total_expenses': expenses_df['amount'].sum(),
-            'total_earnings': earnings_df['amount'].sum(),
-            'total_investments': investments_df['amount'].sum(),
-            'expense_categories': expenses_df.groupby('category')['amount'].sum().to_dict(),
-            'goals_progress': goals_df.apply(
-                lambda x: {'name': x['name'], 'progress': (x['current_amount'] / x['target_amount']) * 100},
-                axis=1
-            ).tolist()
+            'total_expenses': float(total_expenses),
+            'total_earnings': float(total_earnings),
+            'total_investments': float(total_investments),
+            'expense_categories': expense_categories,
+            'goals_progress': goals_progress
         }
         
+        print("Dashboard data:", dashboard_data)
         return jsonify(dashboard_data)
     except Exception as e:
+        print(f"Error in get_dashboard_data: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

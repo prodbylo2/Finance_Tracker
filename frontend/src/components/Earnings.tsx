@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -9,15 +9,18 @@ import {
   TextField,
   Typography,
   MenuItem,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import DataTable from './DataTable';
+import api from '../utils/api';
 
 const categories = [
   'Salary',
   'Freelance',
-  'Investments',
+  'Investment',
   'Business',
-  'Rental Income',
+  'Rental',
   'Other',
 ];
 
@@ -45,11 +48,51 @@ const Earnings = () => {
   const [open, setOpen] = useState(false);
   const [earnings, setEarnings] = useState<Earning[]>([]);
   const [newEarning, setNewEarning] = useState<Earning>({
-    date: '',
+    date: new Date().toISOString().split('T')[0],
     amount: 0,
     category: '',
     description: '',
   });
+  const [errors, setErrors] = useState({
+    date: false,
+    amount: false,
+    category: false,
+    description: false,
+  });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success' as 'success' | 'error',
+  });
+
+  useEffect(() => {
+    fetchEarnings();
+  }, []);
+
+  const fetchEarnings = async () => {
+    try {
+      const data = await api.getEarnings();
+      setEarnings(data);
+    } catch (error) {
+      console.error('Error fetching earnings:', error);
+      setSnackbar({
+        open: true,
+        message: 'Error loading earnings',
+        severity: 'error',
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      date: !newEarning.date,
+      amount: !newEarning.amount || newEarning.amount <= 0,
+      category: !newEarning.category,
+      description: !newEarning.description,
+    };
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(Boolean);
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -57,17 +100,46 @@ const Earnings = () => {
 
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const handleSubmit = () => {
-    setEarnings([...earnings, newEarning]);
     setNewEarning({
-      date: '',
+      date: new Date().toISOString().split('T')[0],
       amount: 0,
       category: '',
       description: '',
     });
-    handleClose();
+    setErrors({
+      date: false,
+      amount: false,
+      category: false,
+      description: false,
+    });
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      await api.addEarning(newEarning);
+      await fetchEarnings();
+      handleClose();
+      setSnackbar({
+        open: true,
+        message: 'Earning added successfully',
+        severity: 'success',
+      });
+    } catch (error: any) {
+      console.error('Error adding earning:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.error || 'Error adding earning',
+        severity: 'error',
+      });
+    }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -93,31 +165,40 @@ const Earnings = () => {
             label="Date"
             type="date"
             fullWidth
+            required
             InputLabelProps={{ shrink: true }}
             value={newEarning.date}
             onChange={(e) =>
               setNewEarning({ ...newEarning, date: e.target.value })
             }
+            error={errors.date}
+            helperText={errors.date && 'Date is required'}
           />
           <TextField
             margin="dense"
             label="Amount"
             type="number"
             fullWidth
+            required
             value={newEarning.amount}
             onChange={(e) =>
-              setNewEarning({ ...newEarning, amount: Number(e.target.value) })
+              setNewEarning({ ...newEarning, amount: parseFloat(e.target.value) || 0 })
             }
+            error={errors.amount}
+            helperText={errors.amount && 'Amount must be greater than 0'}
           />
           <TextField
             margin="dense"
             label="Category"
             select
             fullWidth
+            required
             value={newEarning.category}
             onChange={(e) =>
               setNewEarning({ ...newEarning, category: e.target.value })
             }
+            error={errors.category}
+            helperText={errors.category && 'Category is required'}
           >
             {categories.map((category) => (
               <MenuItem key={category} value={category}>
@@ -129,19 +210,38 @@ const Earnings = () => {
             margin="dense"
             label="Description"
             fullWidth
+            required
+            multiline
+            rows={2}
             value={newEarning.description}
             onChange={(e) =>
               setNewEarning({ ...newEarning, description: e.target.value })
             }
+            error={errors.description}
+            helperText={errors.description && 'Description is required'}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary">
+          <Button onClick={handleSubmit} variant="contained">
             Add
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
