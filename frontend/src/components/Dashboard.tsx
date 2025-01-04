@@ -144,34 +144,54 @@ const Dashboard = () => {
           </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ p: 2, height: '432px', display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" gutterBottom>
               Goals Progress
             </Typography>
-            {dashboardData?.goals_progress.map((goal, index) => (
-              <Box key={index} sx={{ mb: 2 }}>
-                <Typography variant="body2" gutterBottom>
-                  {goal.name}
-                </Typography>
-                <div style={{ 
-                  width: '100%', 
-                  height: '10px', 
-                  backgroundColor: '#e0e0e0',
-                  borderRadius: '5px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    width: `${goal.progress}%`,
-                    height: '100%',
-                    backgroundColor: '#4CAF50',
-                    transition: 'width 0.3s ease'
-                  }} />
-                </div>
-                <Typography variant="caption" color="textSecondary">
-                  {goal.progress.toFixed(1)}%
-                </Typography>
-              </Box>
-            ))}
+            <Box sx={{
+              flexGrow: 1,
+              overflowY: 'auto',
+              pr: 2,
+              '&::-webkit-scrollbar': {
+                width: '8px',
+              },
+              '&::-webkit-scrollbar-track': {
+                backgroundColor: 'rgba(0,0,0,0.1)',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: 'rgba(0,0,0,0.2)',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0,0,0,0.3)',
+                },
+              },
+            }}>
+              {dashboardData?.goals_progress.map((goal, index) => (
+                <Box key={index} sx={{ mb: 2 }}>
+                  <Typography variant="body2" gutterBottom>
+                    {goal.name}
+                  </Typography>
+                  <div style={{ 
+                    width: '100%', 
+                    height: '10px', 
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '5px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      width: `${goal.progress}%`,
+                      height: '100%',
+                      backgroundColor: '#4CAF50',
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+                  <Typography variant="caption" color="textSecondary">
+                    {goal.progress.toFixed(1)}%
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
           </Paper>
         </Grid>
       </Grid>
