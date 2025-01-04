@@ -74,6 +74,18 @@ export const lightTheme: ThemeOptions = {
       primary: '#2D3250',
       secondary: '#676FA3',
     },
+    grey: {
+      50: '#FAFAFA',
+      100: '#F5F5F5',
+      200: '#EEEEEE',
+      300: '#E0E0E0',
+      400: '#BDBDBD',
+      500: '#9E9E9E',
+      600: '#757575',
+      700: '#616161',
+      800: '#424242',
+      900: '#212121',
+    },
     success: {
       main: '#4CAF50',
       light: '#81C784',
@@ -120,6 +132,18 @@ export const darkTheme: ThemeOptions = {
     text: {
       primary: '#FFFFFF',
       secondary: '#B0B0B0',
+    },
+    grey: {
+      50: '#2C2C2C',
+      100: '#333333',
+      200: '#404040',
+      300: '#4D4D4D',
+      400: '#666666',
+      500: '#808080',
+      600: '#999999',
+      700: '#B3B3B3',
+      800: '#CCCCCC',
+      900: '#E6E6E6',
     },
     success: {
       main: '#4CAF50',

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ThemeProvider as MUIThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material';
 import { lightTheme, darkTheme } from './theme';
 
 interface ThemeContextType {
@@ -25,16 +25,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    setIsDarkMode(prev => !prev);
   };
 
   const theme = createTheme(isDarkMode ? darkTheme : lightTheme);
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-      <MUIThemeProvider theme={theme}>
+      <MuiThemeProvider theme={theme}>
         {children}
-      </MUIThemeProvider>
+      </MuiThemeProvider>
     </ThemeContext.Provider>
   );
 };
