@@ -461,30 +461,37 @@ const Dashboard = () => {
             >
               {dashboardData?.goals_progress.map((goal, index) => (
                 <Box key={index} sx={{ mb: 2 }}>
-                  <Typography variant="body2" gutterBottom>
-                    {goal.name}
-                  </Typography>
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '10px',
-                      backgroundColor: '#e0e0e0',
-                      borderRadius: '5px',
-                      overflow: 'hidden',
-                    }}
-                  >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" sx={{ minWidth: '24px' }}>
+                      {index + 1}.
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      {goal.name}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ pl: 4 }}>
                     <div
                       style={{
-                        width: `${goal.progress}%`,
-                        height: '100%',
-                        backgroundColor: '#4CAF50',
-                        transition: 'width 0.3s ease',
+                        width: '100%',
+                        height: '10px',
+                        backgroundColor: '#e0e0e0',
+                        borderRadius: '5px',
+                        overflow: 'hidden',
                       }}
-                    />
-                  </div>
-                  <Typography variant="caption" color="textSecondary">
-                    {goal.progress.toFixed(1)}%
-                  </Typography>
+                    >
+                      <div
+                        style={{
+                          width: `${goal.progress}%`,
+                          height: '100%',
+                          backgroundColor: '#4CAF50',
+                          transition: 'width 0.3s ease',
+                        }}
+                      />
+                    </div>
+                    <Typography variant="caption" color="textSecondary">
+                      {goal.progress.toFixed(1)}%
+                    </Typography>
+                  </Box>
                 </Box>
               ))}
             </Box>
